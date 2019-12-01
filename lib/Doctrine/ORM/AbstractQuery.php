@@ -860,6 +860,31 @@ abstract class AbstractQuery
     }
 
     /**
+     * Executes the query and returns an IterableResult that can be used to incrementally
+     * iterate over the result.
+     *
+     * @param ArrayCollection|mixed[]|null $parameters    The query parameters.
+     * @param string|int|null              $hydrationMode The hydration mode to use.
+     *
+     * @return iterable<mixed>
+     */
+    public function getIterable($parameters = null, $hydrationMode = null) : iterable
+    {
+        if ($hydrationMode !== null) {
+            $this->setHydrationMode($hydrationMode);
+        }
+
+        if (! empty($parameters)) {
+            $this->setParameters($parameters);
+        }
+
+        $rsm  = $this->getResultSetMapping();
+        $stmt = $this->doExecute();
+
+        return $this->em->newHydrator($this->hydrationMode)->getIterable($stmt, $rsm, $this->hints);
+    }
+
+    /**
      * Executes the query.
      *
      * @param ArrayCollection|mixed[]|null $parameters    Query parameters.

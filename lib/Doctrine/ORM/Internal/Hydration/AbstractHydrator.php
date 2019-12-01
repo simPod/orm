@@ -116,6 +116,31 @@ abstract class AbstractHydrator
     }
 
     /**
+     * Initiates a row-by-row hydration.
+     *
+     * @param mixed[] $hints
+     *
+     * @return iterable<mixed>
+     */
+    public function getIterable(
+        Statement $stmt,
+        ResultSetMapping $resultSetMapping,
+        array $hints = []
+    ) : iterable {
+        $this->stmt  = $stmt;
+        $this->rsm   = $resultSetMapping;
+        $this->hints = $hints;
+
+        $evm = $this->em->getEventManager();
+
+        $evm->addEventListener([Events::onClear], $this);
+
+        $this->prepare();
+
+        return new RowByRowResult($this);
+    }
+
+    /**
      * Hydrates all rows returned by the passed statement instance at once.
      *
      * @param object  $stmt
