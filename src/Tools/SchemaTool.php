@@ -56,6 +56,7 @@ use function interface_exists;
 use function is_numeric;
 use function method_exists;
 use function preg_match;
+use function str_contains;
 use function strtolower;
 
 /**
@@ -1006,7 +1007,21 @@ class SchemaTool
 
         $schemaDiff = $comparator->compareSchemas($fromSchema, $toSchema);
 
-        return $this->platform->getAlterSchemaSQL($schemaDiff);
+        return $this->filterOutMvReferences(
+            $this->platform->getAlterSchemaSQL($schemaDiff),
+        );
+    }
+
+    /**
+     * @param list<string> $sqls
+     *
+     * @return list<string>
+     */
+    private function filterOutMvReferences(array $sqls): array
+    {
+        return array_values(array_filter($sqls, static function (string $sql): bool {
+            return ! str_contains($sql, 'REFERENCES mv__');
+        }));
     }
 
     /**
