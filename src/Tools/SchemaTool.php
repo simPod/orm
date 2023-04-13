@@ -31,12 +31,14 @@ use function array_diff_key;
 use function array_filter;
 use function array_flip;
 use function array_intersect_key;
+use function array_values;
 use function assert;
 use function count;
 use function current;
 use function implode;
 use function in_array;
 use function is_numeric;
+use function str_contains;
 use function strtolower;
 
 /**
@@ -897,7 +899,21 @@ class SchemaTool
         $comparator = $this->schemaManager->createComparator();
         $schemaDiff = $comparator->compareSchemas($fromSchema, $toSchema);
 
-        return $this->platform->getAlterSchemaSQL($schemaDiff);
+        return $this->filterOutMvReferences(
+            $this->platform->getAlterSchemaSQL($schemaDiff),
+        );
+    }
+
+    /**
+     * @param list<string> $sqls
+     *
+     * @return list<string>
+     */
+    private function filterOutMvReferences(array $sqls): array
+    {
+        return array_values(array_filter($sqls, static function (string $sql): bool {
+            return ! str_contains($sql, 'REFERENCES mv__');
+        }));
     }
 
     /**
