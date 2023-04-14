@@ -12,15 +12,6 @@ on:
       - psalm*
       - tests/StaticAnalysis/**
   push:
-    branches:
-      - "*.x"
-    paths:
-      - .github/workflows/static-analysis.yml
-      - composer.*
-      - src/**
-      - phpstan*
-      - psalm*
-      - tests/StaticAnalysis/**
 
 jobs:
   static-analysis-phpstan:

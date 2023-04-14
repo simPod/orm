@@ -12,15 +12,6 @@ on:
       - phpunit.xml.dist
       - tests/**
   push:
-    branches:
-      - "*.x"
-    paths:
-      - .github/workflows/continuous-integration.yml
-      - ci/**
-      - composer.*
-      - src/**
-      - phpunit.xml.dist
-      - tests/**
 
 env:
   fail-fast: true
